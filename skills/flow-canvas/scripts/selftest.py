@@ -67,7 +67,7 @@ def main():
         svg = open(svg_path, encoding="utf-8").read()
         check("SVG 带 data-flowspec 契约版本", 'data-flowspec="1"' in svg)
         n_clickable = len(re.findall(r'data-node="', svg))
-        check("可点节点 data-node = 15（判断节点不带）", n_clickable == 15, str(n_clickable))
+        check("可点节点 data-node = 20（含 5 个判断节点）", n_clickable == 20, str(n_clickable))
         check("SVG 带选中框元素 sel-ring", 'id="sel-ring"' in svg)
         emoji = [ch for ch in svg if 0x1F000 <= ord(ch) <= 0x1FAFF or 0x2600 <= ord(ch) <= 0x27BF]
         check("产物无 emoji", not emoji, "".join(emoji[:5]))

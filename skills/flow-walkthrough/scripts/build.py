@@ -182,6 +182,11 @@ def main():
 
     report = {"pages": len(pages), "nodes": len(nodes), "svg_nodes": len(svg_nodes),
               "state_groups": len(groups), "errors": errors, "warnings": warnings}
+    merged_pages = "".join(pages.values())
+    bad_pages = find_emoji(merged_pages)
+    if bad_pages:
+        errors.append("页面片段含 emoji 字符 %s（构建器硬校验）" % bad_pages[:5])
+
     if args.check or errors:
         print(json.dumps(report, ensure_ascii=False, indent=1))
         sys.exit(1 if errors else 0)

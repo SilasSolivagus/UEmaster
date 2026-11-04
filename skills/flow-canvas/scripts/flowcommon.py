@@ -246,9 +246,14 @@ def t_merge_y(n, offset=18):
 
 # ── SVG 原语 ────────────────────────────────────────────────────────
 def svg_open(w, h, data_attr, style):
-    return ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" '
-            'width="%d" height="%d" %s font-family="%s">'
-            % (w, h, w, h, data_attr, style["font_family"])]
+    out = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" '
+           'width="%d" height="%d" %s font-family="%s">'
+           % (w, h, w, h, data_attr, style["font_family"])]
+    # 主题画布底色（深色主题必需，浅色主题下与页面同色）
+    if style.get("bg"):
+        out.append('<rect x="0" y="0" width="%d" height="%d" fill="%s"/>'
+                   % (w, h, style["bg"]))
+    return out
 
 
 def svg_close():

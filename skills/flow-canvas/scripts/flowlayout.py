@@ -614,7 +614,8 @@ def render_svg(lay, title=""):
     for i, nid in enumerate(lay["order"]):
         n = lay["nodes"][nid]
         cx, cy, w, h, typ = n["x"], n["y"], n["w"], n["h"], n["type"]
-        clickable = '' if typ == "decision" else ' data-node="%s"' % nid
+        # 判断节点也可点击：点开要看的是判定规则（公式、阈值、边界），不是页面
+        clickable = ' data-node="%s"' % nid
         out.append('<g class="node" id="flowchart-%s-%d"%s>' % (nid, i, clickable))
         if typ == "decision":
             sev = n.get("severity")
