@@ -477,6 +477,10 @@ def layout(spec, start=None, style=None, force_spine=None, force_left=None):
                 continue
             sy = a["y"]
             ty = b["y"] + port_off.get(id(e), 0)
+            if abs(sy - ty) < 1:
+                # 同层回边：源与目标同高时，绕行段竖直落差为 0，路径退化成正水平线
+                # 穿过节点（画面上表现为悬空横线）。给回线一个最小落差。
+                ty = sy + 14
             pts = [(a["x"] + a["w"] / 2, sy), (LANE, sy), (LANE, ty), (b["x"] + b["w"] / 2, ty)]
             add(pts, e, lx=LANE - 8, ly=(sy + ty) / 2, anchor="end")
             continue
