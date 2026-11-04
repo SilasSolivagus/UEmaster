@@ -74,7 +74,7 @@ description: 把业务图渲染成横平竖直的规范 SVG：流程图（正交
 | gantt | `YYYY-MM-DD` / `HH:mm`；任务 ≤ 40；`Nd`/`Nw`/`Nm` 时长；`after` 依赖 | 其他 dateFormat、`until`、解析失败 |
 | seq | participant ≤ 6；消息仅相邻列或自消息 | note/alt/loop/opt/激活条、跨列消息、actor |
 
-引擎报错后告知用户该图更适合 mermaid 原生渲染；四类新类型在 `-o` 模式下检查不过会拒绝落盘。
+引擎报错后告知用户该图更适合 mermaid 原生渲染；**五类图**（含 flowchart）在 `-o` 模式下检查不过都会拒绝落盘，`--check` 统一返回 `0`（合格）/ `1`（不合格），可用于脚本与 CI 门禁。
 
 ## 联动契约（供下游消费）
 

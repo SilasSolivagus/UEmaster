@@ -31,9 +31,11 @@ STYLE.update({
 
 MAX_ENTITIES = 8
 CARDS = {"||", "o|", "|o", "o{", "}o", "|{", "}|"}
-ENTITY_RE = re.compile(r'^([A-Za-z][A-Za-z0-9_]*)\s*\{\s*$')
-REL_RE = re.compile(r'^([A-Za-z][A-Za-z0-9_]*)\s+(\S+)\s*--\s*(\S+)\s+([A-Za-z][A-Za-z0-9_]*)\s*:\s*(.*)$')
-_ID_RE = re.compile(r'^[A-Za-z][A-Za-z0-9_]*$')
+# 实体名 / 属性类型 / 属性名：ASCII 标识符或中文（首字符不得为数字）
+_NAME = r'[A-Za-z\u4e00-\u9fff][A-Za-z0-9_\u4e00-\u9fff]*'
+ENTITY_RE = re.compile(r'^(%s)\s*\{\s*$' % _NAME)
+REL_RE = re.compile(r'^(%s)\s+(\S+)\s*--\s*(\S+)\s+(%s)\s*:\s*(.*)$' % (_NAME, _NAME))
+_ID_RE = re.compile(r'^(%s)$' % _NAME)
 _COMMENT_TOKEN_RE = re.compile(r'^[\u4e00-\u9fffA-Za-z0-9_]+$')
 
 # 四邻域（先上下左右）与对角（用于网格放置）
@@ -320,7 +322,7 @@ def _route(edges, ents, pos, cols, rows, col_left, row_top, col_w, row_h, st):
                 lx, ly, anchor = (p1[0] + p2[0]) / 2, p1[1] - 6, "middle"
                 gap = abs(pt[0] - ps[0])
             else:
-                lx, ly, anchor = p1[0] + 8, (p1[1] + p2[1]) / 2, "middle"
+                lx, ly, anchor = p1[0] + 8, (p1[1] + p2[1]) / 2, "start"
                 gap = abs(pt[1] - ps[1])
         else:
             detours += 1

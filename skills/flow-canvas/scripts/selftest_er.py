@@ -197,6 +197,24 @@ def section(check, tmp, run):
     p = run([bad4, "--type", "er", "--check"])
     check("er emoji 输入被拒绝", p.returncode != 0, (p.stderr or "").strip()[:80])
 
+    # ── 中文实体名 / 属性名（mermaid 官方语法允许中文标识符） ──
+    cn = os.path.join(tmp, "er-cn.mmd")
+    with open(cn, "w", encoding="utf-8") as f:
+        f.write(_mmd(['作者 ||--o{ 文章 : "撰写"'],
+                     [("作者", ["int 编号 PK"]), ("文章", ["int 编号 PK"])]))
+    p = run([cn, "--type", "er", "--check"])
+    check("er 中文实体名与属性名可解析", p.returncode == 0 and '"nodes": 2' in (p.stdout or ""),
+          (p.stderr or "").strip()[:80])
+
+    # ── 竖排关系标签不压线（anchor 应为 start，右移 8px 后左端对齐） ──
+    svg_cn = os.path.join(tmp, "er-cn.svg")
+    p = run([cn, "--type", "er", "-o", svg_cn])
+    if p.returncode == 0:
+        _s = open(svg_cn, encoding="utf-8").read()
+        check("er 竖排关系标签不压线（text-anchor=start）",
+              re.search(r'text-anchor="start"[^>]*>撰写<', _s) is not None,
+              "未见 start 锚定标签")
+
 
 if __name__ == "__main__":
     results = []
