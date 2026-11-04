@@ -106,6 +106,38 @@ def main():
     check("复杂图明确降级（报错而非烂图）", p.returncode != 0 and "适用形态" in (p.stderr or ""),
           (p.stderr or p.stdout).strip()[:80])
 
+    # ── 落盘门禁：不干净的布局必须拒绝产出，不得静默产烂图 ──
+    ov = os.path.join(tmp, "overlap.mmd")
+    with open(ov, "w", encoding="utf-8") as f:
+        f.write("flowchart TD\nA[开始] --> B[校验]\nB --> R1[分支1]\nB --> R2[分支2]\n"
+                "B --> R3[分支3]\nR1 --> Z[汇合]\nR2 --> Z\nR3 --> Z\n")
+    chk = run([ov, "--check"])
+    try:
+        chkrep = json.loads(chk.stdout)
+    except Exception:
+        chkrep = None
+    dirty = bool(chkrep) and bool(chkrep.get("crossings") or chkrep.get("overlaps")
+                                  or chkrep.get("textOverflow"))
+    check("--check 退出码反映布局质量",
+          chkrep is not None and (chk.returncode == 0) == (not dirty),
+          "rc=%s dirty=%s" % (chk.returncode, dirty))
+    ov_out = os.path.join(tmp, "overlap.svg")
+    p = run([ov, "-o", ov_out])
+    check("不干净的布局拒绝落盘（不静默产烂图）",
+          (p.returncode != 0 and not os.path.exists(ov_out))
+          or (p.returncode == 0 and not dirty and os.path.exists(ov_out)),
+          "rc=%s exists=%s dirty=%s" % (p.returncode, os.path.exists(ov_out), dirty))
+
+    # ── 空输入：明确报错，不抛 traceback ──
+    empty = os.path.join(tmp, "empty.mmd")
+    open(empty, "w", encoding="utf-8").close()
+    for args, label in (([empty], "flowchart"), ([empty, "--type", "er"], "er")):
+        p = run(args)
+        err = (p.stderr or "") + (p.stdout or "")
+        check("空输入明确报错而非 traceback（%s）" % label,
+              p.returncode != 0 and "Traceback" not in err and "IndexError" not in err,
+              err.strip()[:80])
+
     # ── L4 多图类型（arch/er/gantt/seq，各自独立自检模块集成） ──
     import importlib
     for mod_name in ("selftest_arch", "selftest_er", "selftest_gantt", "selftest_seq",

@@ -479,6 +479,8 @@ def common_main(args, mod):
       report_extra(lay)         可选：报告附加字段（如 spine）
     """
     spec = mod.load_spec(args.input)
+    if not spec.get("nodes"):
+        raise SystemExit("错误：输入为空或未解析出任何节点（形态超限）")
     bad = []
     for label in mod.iter_labels(spec):
         bad += find_emoji(label)

@@ -38,7 +38,7 @@ import argparse
 
 from flowcommon import (find_emoji, text_width, wrap_label, node_size, esc,
                         ortho_crossings, box_overlaps, text_overflow_check,
-                        build_report, render_html)
+                        build_report, render_html, is_clean)
 
 SPEC_VERSION = "flowspec/1"
 
@@ -642,6 +642,8 @@ def main():
         raise SystemExit(mod.main_cli(args))
 
     spec = load_spec(args.input)
+    if not spec["nodes"]:
+        raise SystemExit("错误：输入为空或未解析出任何节点（形态超限）")
     bad = []
     for n in spec["nodes"]:
         for l in n["label"]:
@@ -664,9 +666,13 @@ def main():
 
     if args.check:
         print(json.dumps(report, ensure_ascii=False, indent=1))
-        return
+        raise SystemExit(0 if is_clean(report) else 1)
     if not args.output:
         raise SystemExit("错误：需要 -o 指定输出文件（或使用 --check）")
+    if not is_clean(report):
+        raise SystemExit("错误：布局检查未通过（交叉 %d / 重叠 %d / 文字溢出 %d），"
+                         "形态超限已拒绝产出——建议拆图、折叠细节或改用 mermaid 原生渲染。"
+                         % (report["crossings"], report["overlaps"], report["textOverflow"]))
     content = render_html(render_svg(lay, args.title), args.title,
                           lay["style"]["font_family"]) if args.html else render_svg(lay, args.title)
     with open(args.output, "w", encoding="utf-8", newline="\n") as f:
