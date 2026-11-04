@@ -59,6 +59,8 @@ DEFAULT_STYLE = {
     "fill_p0": "#fbe9e9", "stroke_p0": "#c0392b",
     "fill_p1": "#fdf1e3", "stroke_p1": "#d98324",
     "fill_p2": "#f0f0f0", "stroke_p2": "#8a8a8a",
+    "fill_added": "#e8f0fb", "stroke_added": "#2f6fed",
+    "fill_disputed": "#f3ecf9", "stroke_disputed": "#7b4fa8",
     "text_process": "#333333",
     "text_external": "#666666",
     "text_backend": "#333333",
@@ -84,6 +86,10 @@ CLASS_TYPE = {"external": "external", "wallet": "external", "ext": "external",
 SEVERITY_TYPE = {"p0": "p0", "critical": "p0", "blocker": "p0",
                  "p1": "p1", "major": "p1", "high": "p1",
                  "p2": "p2", "minor": "p2", "low": "p2"}
+
+# 评审标记：区分「PRD 原文写的」与「评审认为需要改的」
+MARK_TYPE = {"added": "added", "proposed": "added", "suggest": "added",
+             "disputed": "disputed", "doubt": "disputed", "wrong": "disputed"}
 
 
 def parse_mermaid(src):
@@ -123,13 +129,16 @@ def parse_mermaid(src):
             key = cm.group(2).lower()
             t = CLASS_TYPE.get(key)
             sev = None if t else SEVERITY_TYPE.get(key)
-            if t or sev:
+            mark = None if (t or sev) else MARK_TYPE.get(key)
+            if t or sev or mark:
                 for nid in [x.strip() for x in cm.group(1).split(",")]:
                     ensure(nid)
                     if t:
                         nodes[nid]["type"] = t
                     if sev:
                         nodes[nid]["severity"] = sev
+                    if mark:
+                        nodes[nid]["severity"] = mark
             continue
         if "-->" in line or "-.->" in line:
             parts = re.split(r'\s*(?:-->|-\.->)\s*', line)
@@ -605,9 +614,13 @@ def render_svg(lay, title=""):
         clickable = '' if typ == "decision" else ' data-node="%s"' % nid
         out.append('<g class="node" id="flowchart-%s-%d"%s>' % (nid, i, clickable))
         if typ == "decision":
+            sev = n.get("severity")
+            fill_key = "fill_" + (sev or "decision")
+            stroke_key = "stroke_" + (sev or "decision")
+            sw = "1.8" if sev else "1.3"
             pts = "%g,%g %g,%g %g,%g %g,%g" % (cx, cy - h / 2, cx + w / 2, cy, cx, cy + h / 2, cx - w / 2, cy)
-            out.append('<polygon points="%s" fill="%s" stroke="%s" stroke-width="1.3"/>'
-                       % (pts, st["fill_decision"], st["stroke_decision"]))
+            out.append('<polygon points="%s" fill="%s" stroke="%s" stroke-width="%s"/>'
+                       % (pts, st[fill_key], st[stroke_key], sw))
         else:
             dash = ' stroke-dasharray="5 4"' if typ == "external" else ""
             sw = "1.5" if typ == "process" else "1.3"
