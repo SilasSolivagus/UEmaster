@@ -72,6 +72,15 @@ def theme_vars(override):
     return base
 
 
+def svg_blocks(wm, svg_dark):
+    """浅色 SVG 常显；有深色版本时叠加一份默认隐藏的，供页面内切换。"""
+    light = '<div id="flow-svg-light" class="svg-slot">%s</div>' % wm["_svg"]
+    if not svg_dark:
+        return light
+    dark = '<div id="flow-svg-dark" class="svg-slot" style="display:none">%s</div>' % svg_dark
+    return light + dark
+
+
 def main():
     ap = argparse.ArgumentParser(description="flow-walkthrough 构建器")
     ap.add_argument("walkmap")
@@ -95,6 +104,14 @@ def main():
         errors.append("svg 文件不存在：%s" % wm.get("svg"))
     else:
         svg = open(svg_path, encoding="utf-8").read()
+        wm["_svg"] = svg
+        svg_dark = ""
+        if wm.get("svg_dark"):
+            dpath = os.path.join(base, wm["svg_dark"])
+            if os.path.isfile(dpath):
+                svg_dark = open(dpath, encoding="utf-8").read()
+            else:
+                warnings.append("svg_dark 文件不存在：%s" % wm["svg_dark"])
         if 'data-flowspec="1"' not in svg:
             errors.append("SVG 缺少 data-flowspec=\"1\" 契约标记（需要 flow-canvas flowspec/1 产物）")
 
@@ -183,7 +200,7 @@ def main():
             .replace("__TITLE__", wm.get("title", "流程走查"))
             .replace("__CSS_VARS__", css_vars)
             .replace("__LEGEND__", legend_html(svg))
-            .replace("__SVG__", svg)
+            .replace("__SVG__", svg_blocks(wm, svg_dark))
             .replace("__PAGES_PHONE__", page_divs("phone"))
             .replace("__PAGES_WIDE__", page_divs("wide"))
             .replace("__NODES_JSON__", json.dumps(nodes, ensure_ascii=False))

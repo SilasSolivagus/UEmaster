@@ -25,6 +25,15 @@
   --ux-d-fast: 120ms; --ux-d-base: 200ms; --ux-d-slow: 320ms;
   --ux-e-standard: cubic-bezier(0.2, 0, 0, 1);
 }
+
+[data-theme="dark"] {
+  --wt-bg: #000000; --wt-white: #141416;
+  --wt-border: #3A3A41; --wt-border-light: #2C2C31;
+  --wt-text: #F2F2F4; --wt-dim: #A1A1AA; --wt-light: #6E6E78;
+  --wt-fill: #1F1F23; --wt-accent: #F5A524;
+}
+:root {
+}
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { min-height: 100%; background: var(--wt-bg); color: var(--wt-text);
   font-family: var(--ux-sans); }
@@ -181,6 +190,18 @@ html, body { min-height: 100%; background: var(--wt-bg); color: var(--wt-text);
   .stage { margin: 0 auto; }
   .anno-panel { width: 100%; max-width: 760px; margin: 0 auto; }
 }
+/* 深色下缺口标记改用暗底亮边，避免浅底刺眼 */
+[data-theme="dark"] .anno-item.gap-p0 { background: #2A1416; border-left-color: #FF6369; }
+[data-theme="dark"] .anno-item.gap-p1 { background: #2A2114; border-left-color: #F5A524; }
+[data-theme="dark"] .anno-item.gap-p2 { background: #1F1F23; border-left-color: #6E6E78; }
+[data-theme="dark"] .anno-item.gap-p0 b { color: #FF8388; }
+[data-theme="dark"] .anno-item.gap-p1 b { color: #F5A524; }
+[data-theme="dark"] .wt-empty.gap-p0, [data-theme="dark"] .wt-card.gap-p0 { background: #2A1416; border-color: #FF6369; }
+[data-theme="dark"] .wt-empty.gap-p1, [data-theme="dark"] .wt-card.gap-p1 { background: #2A2114; border-color: #F5A524; }
+[data-theme="dark"] .wt-badge.gap-p0 { background: #2A1416; color: #FF8388; border-color: #FF6369; }
+[data-theme="dark"] .wt-badge.gap-p1 { background: #2A2114; color: #F5A524; border-color: #F5A524; }
+[data-theme="dark"] .fp-legend i { background: transparent; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
@@ -197,6 +218,7 @@ html, body { min-height: 100%; background: var(--wt-bg); color: var(--wt-text);
     <span class="zb" onclick="setZoom(1)">&#65291;</span>
     <span class="zb" onclick="setZoom(0)">适宽</span>
     <span class="zb" id="fs-btn" onclick="toggleFs()">全屏</span>
+    <span class="zb" id="theme-btn" onclick="toggleTheme()">深色</span>
     <span style="margin-left:auto;">点击节点联动右侧页面</span>
   </div>
   __LEGEND__
@@ -288,6 +310,17 @@ function setViewByNode(nodeId) {
   if (ph.scrollTo) ph.scrollTo(0, 0);
 }
 window.goNode = setViewByNode;
+
+function toggleTheme() {
+  var root = document.documentElement;
+  var toDark = root.getAttribute("data-theme") !== "dark";
+  root.setAttribute("data-theme", toDark ? "dark" : "light");
+  var btn = document.getElementById("theme-btn");
+  if (btn) btn.textContent = toDark ? "浅色" : "深色";
+  var l = document.getElementById("flow-svg-light"), d = document.getElementById("flow-svg-dark");
+  if (l) l.style.display = toDark ? "none" : "block";
+  if (d) d.style.display = toDark ? "block" : "none";
+}
 
 document.querySelectorAll('.flow-svg g[data-node]').forEach(function (g) {
   g.addEventListener("click", function () { setViewByNode(g.getAttribute("data-node")); });
