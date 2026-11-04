@@ -18,6 +18,10 @@
   --ux-r-xs: 4px; --ux-r-sm: 6px; --ux-r-md: 10px; --ux-r-lg: 14px; --ux-r-pill: 999px;
   --ux-s-0: 0; --ux-s-1: 4px; --ux-s-2: 8px; --ux-s-3: 12px;
   --ux-s-4: 16px; --ux-s-5: 24px; --ux-s-6: 32px; --ux-s-7: 48px;
+  --ux-h-control: 32px; --ux-h-control-phone: 44px;
+  --ux-h-row: 40px; --ux-h-row-dense: 32px; --ux-h-topbar: 56px;
+  --ux-h-nav-phone: 44px; --ux-h-status-phone: 24px; --ux-h-btn-phone: 44px;
+  --ux-h-device-phone-min: 680px; --ux-h-table-head: 32px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { min-height: 100%; background: var(--wt-bg); color: var(--wt-text);
@@ -51,7 +55,7 @@ html, body { min-height: 100%; background: var(--wt-bg); color: var(--wt-text);
 
 /* 中：设备框 */
 .stage { flex-shrink: 0; position: sticky; top: var(--ux-s-5); }
-.frame-phone { width: 375px; min-height: 680px; max-height: calc(100vh - var(--ux-s-7)); overflow-y: auto;
+.frame-phone { width: 375px; min-height: var(--ux-h-device-phone-min); max-height: calc(100vh - var(--ux-s-7)); overflow-y: auto;
   background: var(--wt-white); border: 1px solid var(--wt-border); border-radius: 12px; }
 .frame-phone::-webkit-scrollbar { width: 0; }
 .frame-wide { width: 690px; background: var(--wt-white); border: 1px solid var(--wt-border); border-radius: var(--ux-r-md); overflow: hidden; }
@@ -90,12 +94,13 @@ html, body { min-height: 100%; background: var(--wt-bg); color: var(--wt-text);
 .st-btn.cur { background: var(--wt-accent); color: var(--wt-white); border-color: var(--wt-accent); cursor: default; }
 
 /* 页面片段可用的基础组件样式 */
-.wt-titlebar { display: flex; align-items: center; height: 44px; padding: 0 var(--ux-s-3);
+.wt-titlebar { display: flex; align-items: center; height: var(--ux-h-nav-phone); padding: 0 var(--ux-s-3);
   border-bottom: 1px solid var(--wt-border); font-size: var(--ux-fs-section); font-weight: 600; justify-content: center; }
 .wt-body { padding: var(--ux-s-4); }
-.wt-input { width: 100%; padding: var(--ux-s-2) var(--ux-s-3); border: 1px solid var(--wt-border); border-radius: var(--ux-r-xs);
-  font-size: var(--ux-fs-body); background: var(--wt-white); margin-bottom: var(--ux-s-3); }
-.wt-btn { display: block; width: 100%; padding: var(--ux-s-2) 0; border: none; border-radius: var(--ux-r-pill);
+.wt-input { width: 100%; height: var(--ux-h-control); padding: 0 var(--ux-s-3); border: 1px solid var(--wt-border); border-radius: var(--ux-r-xs);
+  font-size: var(--ux-fs-body); line-height: var(--ux-h-control); background: var(--wt-white); margin-bottom: var(--ux-s-3); }
+.wt-btn { display: flex; align-items: center; justify-content: center; width: 100%;
+  height: var(--ux-h-btn-phone); padding: 0 var(--ux-s-4); border: none; border-radius: var(--ux-r-pill);
   font-size: var(--ux-fs-body); text-align: center; cursor: pointer; background: var(--wt-accent); color: var(--wt-white); }
 .wt-card { margin: var(--ux-s-3); padding: var(--ux-s-3); border: 1px solid var(--wt-border); border-radius: var(--ux-r-sm); background: var(--wt-white); }
 .wt-badge { display: inline-block; padding: var(--ux-s-1) var(--ux-s-2); border: 1px solid var(--wt-border); border-radius: var(--ux-r-xs);
@@ -103,12 +108,13 @@ html, body { min-height: 100%; background: var(--wt-bg); color: var(--wt-text);
 .wt-dimtext { font-size: var(--ux-fs-body-s); color: var(--wt-dim); line-height: 1.6; }
 
 /* 页面片段可用的扩展组件：手机页面骨架、列表、弹窗与提示、后台页面（用法见 references/page-guide.md） */
-.wt-screen { position: relative; min-height: 680px; margin-bottom: -24px; }
-.wt-statusbar { display: flex; align-items: center; justify-content: space-between; height: 24px; padding: 0 var(--ux-s-3);
+.frame-phone .wt-input { height: var(--ux-h-control-phone); line-height: var(--ux-h-control-phone); }
+.wt-screen { position: relative; min-height: var(--ux-h-device-phone-min); margin-bottom: -24px; }
+.wt-statusbar { display: flex; align-items: center; justify-content: space-between; height: var(--ux-h-status-phone); padding: 0 var(--ux-s-3);
   font-size: var(--ux-fs-caption); color: var(--wt-dim); }
 .wt-sb-icons { position: relative; width: 22px; height: 10px; border: 1px solid var(--wt-light); border-radius: var(--ux-r-xs); }
 .wt-sb-icons::after { content: ""; position: absolute; right: -4px; top: 2px; width: 2px; height: 4px; background: var(--wt-light); }
-.wt-nav { position: relative; display: flex; align-items: center; height: 44px; padding: 0 var(--ux-s-3);
+.wt-nav { position: relative; display: flex; align-items: center; height: var(--ux-h-nav-phone); padding: 0 var(--ux-s-3);
   border-bottom: 1px solid var(--wt-border-light); font-size: var(--ux-fs-body); }
 .wt-nav-title { position: absolute; left: 60px; right: 60px; text-align: center; font-size: var(--ux-fs-section); font-weight: 600;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
@@ -133,7 +139,8 @@ html, body { min-height: 100%; background: var(--wt-bg); color: var(--wt-text);
 .wt-empty::before { content: ""; display: block; width: 56px; height: 56px; margin: 0 auto var(--ux-s-3);
   border: 1.5px dashed var(--wt-border); border-radius: 50%; }
 .wt-btn.wt-btn-ghost { background: var(--wt-white); color: var(--wt-text); border: 1px solid var(--wt-border); }
-.wt-btn.wt-btn-sm { display: inline-block; width: auto; padding: var(--ux-s-1) var(--ux-s-3); font-size: var(--ux-fs-caption); border-radius: var(--ux-r-pill); }
+.wt-btn.wt-btn-sm { display: inline-flex; align-items: center; width: auto;
+  height: var(--ux-h-control); padding: 0 var(--ux-s-3); font-size: var(--ux-fs-caption); border-radius: var(--ux-r-pill); }
 .wt-bottombar { position: absolute; left: 0; right: 0; bottom: 0; padding: var(--ux-s-3) var(--ux-s-4) var(--ux-s-4);
   border-top: 1px solid var(--wt-border-light); background: var(--wt-white); }
 .wt-modal { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center;
@@ -150,8 +157,8 @@ html, body { min-height: 100%; background: var(--wt-bg); color: var(--wt-text);
 .wt-browserbar span { flex: 1; margin-left: var(--ux-s-2); padding: var(--ux-s-1) var(--ux-s-3); border-radius: 4px; background: var(--wt-fill);
   font-size: var(--ux-fs-caption); color: var(--wt-dim); }
 .wt-table { width: 100%; border-collapse: collapse; font-size: var(--ux-fs-caption); }
-.wt-table th { padding: var(--ux-s-2); background: var(--wt-fill); color: var(--wt-dim); font-size: var(--ux-fs-caption); font-weight: 600; text-align: left; }
-.wt-table td { padding: var(--ux-s-2); border-top: 1px solid var(--wt-border-light); }
+.wt-table th { height: var(--ux-h-table-head); padding: 0 var(--ux-s-2); background: var(--wt-fill); color: var(--wt-dim); font-size: var(--ux-fs-caption); font-weight: 600; text-align: left; }
+.wt-table td { height: var(--ux-h-row); padding: 0 var(--ux-s-2); border-top: 1px solid var(--wt-border-light); }
 /* 窄视口：三栏改为纵向堆叠，避免整页横向溢出 */
 @media (max-width: 1680px) {
   .layout { justify-content: flex-start; }
