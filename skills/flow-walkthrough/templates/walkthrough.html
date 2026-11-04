@@ -19,7 +19,7 @@ html, body { min-height: 100%; background: var(--wt-bg); color: var(--wt-text);
 
 
 /* 左：流程画布 */
-.flow-panel { width: 520px; flex-shrink: 0; position: sticky; top: 20px;
+.flow-panel { width: min(850px, 44vw); flex-shrink: 0; position: sticky; top: 20px;
   height: calc(100vh - 40px); display: flex; flex-direction: column; }
 .flow-panel.fs { position: fixed; inset: 0; z-index: 300; width: auto; height: 100vh;
   padding: 16px 20px; background: var(--wt-bg); }
@@ -146,16 +146,17 @@ html, body { min-height: 100%; background: var(--wt-bg); color: var(--wt-text);
 .wt-table th { padding: 7px 8px; background: var(--wt-fill); color: var(--wt-dim); font-size: 10px; font-weight: 600; text-align: left; }
 .wt-table td { padding: 9px 8px; border-top: 1px solid var(--wt-border-light); }
 /* 窄视口：三栏改为纵向堆叠，避免整页横向溢出 */
-@media (max-width: 1680px) {
+@media (max-width: 1800px) {
   .layout { justify-content: flex-start; }
   .flow-panel, .stage, .anno-panel { position: static; width: 100%; max-width: 100%; }
-  .flow-panel { height: auto; max-width: 760px; }
+  .flow-panel { height: auto; max-width: 760px; margin: 0 auto; }
   .flow-svg { overflow: visible; }
   .flow-panel.fs { position: fixed; height: 100vh; max-height: none; }
   .anno-panel { max-height: none; }
   .frame-phone { max-height: 82vh; }
   .frame-wide { width: 100%; }
-  .anno-panel { width: 100%; max-width: 760px; }
+  .stage { margin: 0 auto; }
+  .anno-panel { width: 100%; max-width: 760px; margin: 0 auto; }
 }
 </style>
 </head>
@@ -169,6 +170,7 @@ html, body { min-height: 100%; background: var(--wt-bg); color: var(--wt-text);
     <span class="zv" id="zv">100%</span>
     <span class="zb" onclick="setZoom(1)">&#65291;</span>
     <span class="zb" onclick="setZoom(0)">适宽</span>
+    <span class="zb" onclick="setZoomPct(100)">1:1</span>
     <span class="zb" id="fs-btn" onclick="toggleFs()">全屏</span>
     <span style="margin-left:auto;">点击节点联动右侧页面</span>
   </div>
@@ -261,6 +263,7 @@ function setViewByNode(nodeId) {
   if (ph.scrollTo) ph.scrollTo(0, 0);
 }
 window.goNode = setViewByNode;
+setZoom(0);
 
 document.querySelectorAll('.flow-svg g[data-node]').forEach(function (g) {
   g.addEventListener("click", function () { setViewByNode(g.getAttribute("data-node")); });
@@ -270,12 +273,25 @@ var zoomPct = 100, panX = 0, panY = 0;
 function applyPan() {
   document.getElementById("flow-canvas-inner").style.transform = "translate(" + panX + "px," + panY + "px)";
 }
-function setZoom(dir) {
-  zoomPct = dir === 0 ? 100 : Math.min(300, Math.max(100, zoomPct + dir * 40));
-  if (dir === 0) { panX = 0; panY = 0; applyPan(); }
-  var svg = document.querySelector("#flow-svg svg");
+function svgEl() { return document.querySelector("#flow-svg svg"); }
+function fitPct() {
+  var svg = svgEl(), box = document.getElementById("flow-svg");
+  if (!svg || !box || !box.clientWidth) return 100;
+  var nat = parseFloat(svg.getAttribute("width"));
+  if (!nat) { var vb = svg.viewBox && svg.viewBox.baseVal; nat = vb && vb.width; }
+  if (!nat) return 100;
+  return Math.max(35, Math.min(100, Math.floor(box.clientWidth / nat * 100)));
+}
+function setZoomPct(p) {
+  zoomPct = Math.max(35, Math.min(300, Math.round(p)));
+  var svg = svgEl();
   if (svg) svg.style.width = zoomPct + "%";
-  document.getElementById("zv").textContent = zoomPct + "%";
+  var zv = document.getElementById("zv");
+  if (zv) zv.textContent = zoomPct + "%";
+}
+function setZoom(dir) {
+  if (dir === 0) { panX = 0; panY = 0; applyPan(); setZoomPct(fitPct()); return; }
+  setZoomPct(zoomPct + dir * 25);
 }
 (function () {
   var fs = document.getElementById("flow-svg");
