@@ -56,6 +56,9 @@ DEFAULT_STYLE = {
     "fill_external": "#ffffff",
     "fill_backend": "#d9d9d9",
     "fill_decision": "#ededed",
+    "fill_p0": "#fbe9e9", "stroke_p0": "#c0392b",
+    "fill_p1": "#fdf1e3", "stroke_p1": "#d98324",
+    "fill_p2": "#f0f0f0", "stroke_p2": "#8a8a8a",
     "text_process": "#333333",
     "text_external": "#666666",
     "text_backend": "#333333",
@@ -76,6 +79,11 @@ NODE_SHAPES = [
 ID_RE = re.compile(r'([A-Za-z][A-Za-z0-9_]*)')
 CLASS_TYPE = {"external": "external", "wallet": "external", "ext": "external",
               "backend": "backend", "back": "backend", "admin": "backend"}
+
+# 缺口严重度着色：class A,B p0  → 红；p1 → 橙；p2 → 灰
+SEVERITY_TYPE = {"p0": "p0", "critical": "p0", "blocker": "p0",
+                 "p1": "p1", "major": "p1", "high": "p1",
+                 "p2": "p2", "minor": "p2", "low": "p2"}
 
 
 def parse_mermaid(src):
@@ -112,11 +120,16 @@ def parse_mermaid(src):
             continue
         cm = re.match(r'^class\s+([\w,\s]+?)\s+(\w+);?$', line)
         if cm:
-            t = CLASS_TYPE.get(cm.group(2).lower())
-            if t:
+            key = cm.group(2).lower()
+            t = CLASS_TYPE.get(key)
+            sev = None if t else SEVERITY_TYPE.get(key)
+            if t or sev:
                 for nid in [x.strip() for x in cm.group(1).split(",")]:
                     ensure(nid)
-                    nodes[nid]["type"] = t
+                    if t:
+                        nodes[nid]["type"] = t
+                    if sev:
+                        nodes[nid]["severity"] = sev
             continue
         if "-->" in line or "-.->" in line:
             parts = re.split(r'\s*(?:-->|-\.->)\s*', line)
@@ -598,8 +611,13 @@ def render_svg(lay, title=""):
         else:
             dash = ' stroke-dasharray="5 4"' if typ == "external" else ""
             sw = "1.5" if typ == "process" else "1.3"
+            sev = n.get("severity")
+            fill_key = "fill_" + (sev or typ)
+            stroke_key = "stroke_" + (sev or typ)
+            if sev:
+                sw = "2"
             out.append('<rect x="%g" y="%g" width="%g" height="%g" rx="4" fill="%s" stroke="%s" stroke-width="%s"%s/>'
-                       % (cx - w / 2, cy - h / 2, w, h, st["fill_" + typ], st["stroke_" + typ], sw, dash))
+                       % (cx - w / 2, cy - h / 2, w, h, st[fill_key], st[stroke_key], sw, dash))
             if typ == "backend":
                 for dx in (cx - w / 2 + 6, cx + w / 2 - 6):
                     out.append('<line x1="%g" y1="%g" x2="%g" y2="%g" stroke="%s" stroke-width="1.3"/>'
