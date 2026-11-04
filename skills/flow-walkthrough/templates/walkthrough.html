@@ -29,6 +29,11 @@ html, body { min-height: 100%; background: var(--wt-bg); color: var(--wt-text);
 .zb { padding: 2px 10px; border: 1px solid var(--wt-border); border-radius: 4px; cursor: pointer;
   background: var(--wt-white); user-select: none; color: var(--wt-text); }
 .zv { min-width: 40px; text-align: center; }
+.fp-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-bottom: 8px;
+  font-size: 11px; color: var(--wt-dim); }
+.fp-legend .lg { display: inline-flex; align-items: center; gap: 5px; }
+.fp-legend i { width: 9px; height: 9px; border-radius: 2px; border: 1.5px solid;
+  display: inline-block; }
 .flow-svg { flex: 1; min-height: 0; overflow: hidden; border: 1px solid var(--wt-border-light);
   border-radius: 6px; background: var(--wt-white); cursor: grab; touch-action: none; user-select: none; }
 .flow-svg:active { cursor: grabbing; }
@@ -167,6 +172,7 @@ html, body { min-height: 100%; background: var(--wt-bg); color: var(--wt-text);
     <span class="zb" id="fs-btn" onclick="toggleFs()">全屏</span>
     <span style="margin-left:auto;">点击节点联动右侧页面</span>
   </div>
+  __LEGEND__
   <div class="flow-svg" id="flow-svg"><div class="flow-canvas-inner" id="flow-canvas-inner">__SVG__</div></div>
 </aside>
 

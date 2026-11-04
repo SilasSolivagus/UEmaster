@@ -33,6 +33,27 @@ def find_emoji(text):
     return [ch for ch in text if any(a <= ord(ch) <= b for a, b in EMOJI_RANGES)]
 
 
+LEGEND_COLORS = [
+    ("#c0392b", "P0 缺口"),
+    ("#d98324", "P1 缺口"),
+    ("#8a8a8a", "P2 缺口"),
+    ("#2f6fed", "评审新增"),
+    ("#7b4fa8", "评审存疑"),
+]
+
+
+def legend_html(svg):
+    """按 SVG 里实际出现的标记色生成图例；没有标记就不占位。"""
+    low = svg.lower()
+    items = []
+    for color, label in LEGEND_COLORS:
+        if color in low:
+            items.append('<span class="lg"><i style="border-color:%s"></i>%s</span>' % (color, label))
+    if not items:
+        return ""
+    return '<div class="fp-legend">%s</div>' % "".join(items)
+
+
 def main():
     ap = argparse.ArgumentParser(description="flow-walkthrough 构建器")
     ap.add_argument("walkmap")
@@ -143,6 +164,7 @@ def main():
     html = (open(TEMPLATE, encoding="utf-8").read()
             .replace("__TITLE__", wm.get("title", "流程走查"))
             .replace("__CSS_VARS__", css_vars)
+            .replace("__LEGEND__", legend_html(svg))
             .replace("__SVG__", svg)
             .replace("__PAGES_PHONE__", page_divs("phone"))
             .replace("__PAGES_WIDE__", page_divs("wide"))
