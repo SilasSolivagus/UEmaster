@@ -19,7 +19,7 @@
   "edge_color": "#5E6776",
   "label_color": "#8A92A0",
   "sel_ring_stroke": "#2448D0",
-  "sel_ring_fill": "#EAEFFC",
+  "sel_ring_fill": "#2448D01A",
   "fill_p0": "#FCECEC",
   "stroke_p0": "#B4232B",
   "fill_p1": "#FBF1DC",
