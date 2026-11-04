@@ -1,6 +1,6 @@
 {
   "bg": "#FFFFFF",
-  "font_family": "PingFang SC, HarmonyOS Sans SC, Hiragino Sans GB, Microsoft YaHei, Noto Sans SC, -apple-system, sans-serif",
+  "font_family": "PingFang SC, HarmonyOS Sans SC, Hiragino Sans GB, Microsoft YaHei, Noto Sans SC, system-ui, sans-serif",
   "fs_node": 13,
   "fs_sub": 12,
   "fs_label": 12,
@@ -19,7 +19,7 @@
   "edge_color": "#5E6776",
   "label_color": "#8A92A0",
   "sel_ring_stroke": "#2448D0",
-  "sel_ring_fill": "rgba(36,72,208,0.08)",
+  "sel_ring_fill": "#EAEFFC",
   "fill_p0": "#FCECEC",
   "stroke_p0": "#B4232B",
   "fill_p1": "#FBF1DC",
