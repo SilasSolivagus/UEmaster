@@ -54,6 +54,24 @@ def legend_html(svg):
     return '<div class="fp-legend">%s</div>' % "".join(items)
 
 
+THEME_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__)))), "_theme")
+DEFAULT_THEME = os.path.join(THEME_DIR, "default.walkmap.json")
+
+
+def theme_vars(override):
+    """默认主题的 css_vars 打底，walkmap 里的同键覆盖。"""
+    base = {}
+    if os.path.exists(DEFAULT_THEME):
+        try:
+            with open(DEFAULT_THEME, encoding="utf-8") as f:
+                base = json.load(f).get("css_vars", {}) or {}
+        except Exception:
+            base = {}
+    base.update(override or {})
+    return base
+
+
 def main():
     ap = argparse.ArgumentParser(description="flow-walkthrough 构建器")
     ap.add_argument("walkmap")
@@ -160,7 +178,7 @@ def main():
                 out.append('<div class="page" id="%s">\n%s\n</div>' % (pid, html))
         return "\n".join(out)
 
-    css_vars = "".join("  %s: %s;\n" % (k, v) for k, v in wm.get("css_vars", {}).items())
+    css_vars = "".join("  %s: %s;\n" % (k, v) for k, v in theme_vars(wm.get("css_vars", {})).items())
     html = (open(TEMPLATE, encoding="utf-8").read()
             .replace("__TITLE__", wm.get("title", "流程走查"))
             .replace("__CSS_VARS__", css_vars)

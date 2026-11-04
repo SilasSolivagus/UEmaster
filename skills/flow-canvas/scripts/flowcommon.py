@@ -29,6 +29,7 @@ flowchart / arch / er / gantt / seq 五类布局模块共用的文本度量、�
 不交付产物。
 """
 import argparse
+import os
 import json
 import sys
 import unicodedata
@@ -420,6 +421,23 @@ def assign_label_lanes(rects, rows=4, step=13):
 
 
 # ── 统一检查报告 ────────────────────────────────────────────────────
+
+THEME_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__)))), "_theme")
+DEFAULT_THEME = os.path.join(THEME_DIR, "default.style.json")
+
+
+def load_style(path):
+    """读取样式覆盖：显式 --style 优先，否则用 _theme/default.style.json。"""
+    target = path or (DEFAULT_THEME if os.path.exists(DEFAULT_THEME) else None)
+    if not target:
+        return None
+    try:
+        with open(target, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as exc:
+        raise SystemExit("错误：样式文件 %s 读取失败：%s" % (target, exc))
+
 def build_report(n_nodes, n_edges, lay):
     report = {
         "nodes": n_nodes,
@@ -486,7 +504,7 @@ def common_main(args, mod):
         bad += find_emoji(label)
     if bad:
         raise SystemExit("错误：输入含 emoji 字符 %s（本工具产物禁用 emoji）" % bad)
-    style = json.loads(open(args.style, encoding="utf-8").read()) if args.style else None
+    style = load_style(args.style)
     lay = mod.layout(spec, style, args)
     report = build_report(len(spec["nodes"]), len(spec["edges"]), lay)
     if hasattr(mod, "report_extra"):

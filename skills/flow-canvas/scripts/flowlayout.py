@@ -38,7 +38,7 @@ import argparse
 
 from flowcommon import (find_emoji, text_width, wrap_label, node_size, esc,
                         ortho_crossings, box_overlaps, text_overflow_check,
-                        build_report, render_html, is_clean)
+                        build_report, render_html, is_clean, load_style)
 
 SPEC_VERSION = "flowspec/1"
 
@@ -596,6 +596,9 @@ def render_svg(lay, title=""):
     out.append('<svg id="flowsvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" '
                'width="%d" height="%d" data-flowspec="1" font-family="%s">'
                % (lay["W"], lay["H"], lay["W"], lay["H"], st["font_family"]))
+    if st.get("bg"):
+        out.append('<rect x="0" y="0" width="%d" height="%d" fill="%s"/>'
+                   % (lay["W"], lay["H"], st["bg"]))
     out.append('<defs><marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" '
                'markerHeight="7" orient="auto-start-reverse">'
                '<path d="M0,0 L10,5 L0,10 z" fill="%s"/></marker></defs>' % st["edge_color"])
@@ -689,7 +692,7 @@ def main():
     if bad:
         raise SystemExit("错误：输入含 emoji 字符 %s（本工具产物禁用 emoji）" % bad)
 
-    style = json.loads(open(args.style, encoding="utf-8").read()) if args.style else None
+    style = load_style(args.style)
     force = [s.strip() for s in args.spine.split(",") if s.strip()] if args.spine else None
     fleft = [s.strip() for s in args.left.split(",") if s.strip()] if args.left else None
     lay = layout(spec, args.start, style, force, fleft)
